@@ -10,6 +10,8 @@ if [ -z "$SAAS_BOOST_ENV" ]; then
 	exit 1
 fi
 
+AWS_REGION=$(aws configure list | grep region | awk '{print $2}')
+ACCOUNT_ID=$(aws sts get-caller-identity --output text --query ["Account"])
 
 cp buildspec.txt buildspec.yaml
 cp trust-policy.txt trust-policy.json
