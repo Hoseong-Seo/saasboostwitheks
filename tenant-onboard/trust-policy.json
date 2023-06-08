@@ -1,0 +1,13 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": "arn:aws:iam::469173825009:role/pipeline-stack-TenantOnboardingRoleB5248B6A-XNBBV1J6OMVR",
+                "Service": "ec2.amazonaws.com"
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}
