@@ -1,0 +1,16 @@
+// Variable overrides
+
+// Colors
+// -------------------------------
+
+$brand-primary: rgb(107, 25, 161);
+
+/*
+This color can also be defined using its hex code or its hsl definition:
+$brand-primary: #6B15A1;
+$brand-primary: hsl(277, 77%, 36%);
+*/
+
+
+$td-sidebar-tree-root-color: $brand-primary !default;
+$td-sidebar-bg-color: rgba($brand-primary, 0.03) !default;

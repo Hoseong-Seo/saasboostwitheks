@@ -1,0 +1,38 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: user-management
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: user-management
+  template:
+    metadata:
+      labels:
+        app: user-management
+    spec:
+      containers:
+        - name: user-management
+          image: 754173030316.dkr.ecr.ap-northeast-2.amazonaws.com/user-management-service-20220917091059:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 3015
+          env:
+            - name: AWS_REGION
+              value: "ap-northeast-2"
+            - name: COGNITO_USER_POOL_ID
+              value: "ap-northeast-2_GspCr9F8D"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: user-management
+spec:
+  selector:
+    app: user-management
+  ports:
+    - name: http
+      protocol: TCP
+      port: 3015
+      targetPort: 3015

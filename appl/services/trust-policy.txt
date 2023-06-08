@@ -1,0 +1,15 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": [
+                    "arn:aws:iam::{{ACCOUNT_ID}}:role/{{CLUSTER_NODE_GROUP}}",
+                    "arn:aws:iam::{{ACCOUNT_ID}}:role/{{CLUSTER_KARPENTER_NODE}}"
+                ]
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}

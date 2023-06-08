@@ -1,0 +1,96 @@
+<alert type="danger" *ngIf="error" [dismissible]="true">
+  <strong>Oh snap!</strong> 데이터 분석에 시작에 문제가 있습니다.
+</alert>
+<alert type="success" *ngIf="success" [dismissible]="true">
+  <strong>Success!</strong> 데이터 분석을 시작하였습니다.
+</alert>
+
+
+<div class="animated fadeIn">
+  
+  
+  
+  <div class="card">
+      <div class="card-header">
+        <strong>Spark Data </strong>
+      </div>
+      <div class="card-body">
+        <form [formGroup]="dashboardForm">
+          <div class="form-group">
+            <label for="name">Name</label>
+            <input
+              type="text"
+              formControlName="name"
+              id="name"
+              name="name"
+              class="form-control"
+              placeholder="Enter Spark name.."
+            />
+          </div>
+         
+        </form>
+      </div>
+      <div class="card-footer">
+        <button
+           class="btn btn-block btn-primary"
+           [disabled]="!!dashboardForm.errors"
+           (click)="onSubmit()"
+           type="button"
+        >
+          <span>데이터분석 시작</span>
+        </button>
+      </div>
+    </div>
+  
+  
+  
+  
+  
+  
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-sm-5">
+          <h4 class="card-title mb-0">Historical Sales</h4>
+          <div class="small text-muted">December 2020</div>
+        </div> <!--/.col-->
+      </div> <!--/.row-->
+      <div class="chart-wrapper">
+        <canvas baseChart
+        [datasets]="barChartData"
+        [labels]="barChartLabels"
+        [options]="barChartOptions"
+        [legend]="barChartLegend"
+        [chartType]="barChartType">
+      </canvas>
+      </div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-body">
+      <div class="row">
+        <div class="col-sm-5">
+          <h4 class="card-title mb-0">Orders</h4>
+          <div class="small text-muted">December 2020</div>
+        </div><!--/.col-->
+        <div class="col-sm-7 d-none d-md-block">
+          <button type="button" class="btn btn-primary float-right"><i class="icon-cloud-download"></i></button>
+          <div class="btn-group btn-group-toggle float-right mr-3" data-toggle="buttons">
+            <label class="btn btn-outline-secondary" [(ngModel)]="radioModel" btnRadio="Day" id="option1">Day</label>
+            <label class="btn btn-outline-secondary" [(ngModel)]="radioModel" btnRadio="Month" id="option2">Month</label>
+            <label class="btn btn-outline-secondary" [(ngModel)]="radioModel" btnRadio="Year" id="option3">Year</label>
+          </div>
+        </div><!--/.col-->
+      </div><!--/.row-->
+      <div class="chart-wrapper" style="height:300px;margin-top:40px;">
+        <canvas baseChart class="chart"
+        [datasets]="mainChartData"
+        [labels]="mainChartLabels"
+        [options]="mainChartOptions"
+        [colors]="mainChartColours"
+        [legend]="mainChartLegend"
+        [chartType]="mainChartType"></canvas>
+      </div>
+    </div>
+  </div>
+</div>

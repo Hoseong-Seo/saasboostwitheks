@@ -1,0 +1,15 @@
+{
+    "Version": "2012-10-17",
+    "Statement": [
+        {
+            "Effect": "Allow",
+            "Principal": {
+                "AWS": [
+                    "arn:aws:iam::469173825009:role/cluster-stack-clusterstackNodegroupclusterstackngn-4FZ8IUNFF35",
+                    "arn:aws:iam::469173825009:role/cluster-stack-clusterstackkarpenternoderoleF44BC17-YCK6U46J3SM8"
+                ]
+            },
+            "Action": "sts:AssumeRole"
+        }
+    ]
+}

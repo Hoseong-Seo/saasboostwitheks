@@ -1,0 +1,7 @@
+##ignorefile##
+
+buildspec.txt
+buildspec.yaml_bk
+setup-buildspec.sh
+trust-policy.json
+trust-policy.txt
