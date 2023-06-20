@@ -49,7 +49,7 @@ phases:
       #- TenantName=$(aws cloudformation describe-stacks --query 'Stacks[0].Parameters[?ParameterKey==`TenantName`].ParameterValue' --output text)
       - echo "${TenantName}"
       #- TenantId=$(aws cloudformation describe-stacks --query "Stacks[0].Outputs[?OutputKey=='TenantId'].OutputValue" --output text)
-      - aws codepipeline tag-resource --resource-arn arn:aws:codepipeline:{{AWS_REGION}}:{{ACCOUNT_ID}}:eks-saas-pipeline --tags key=Tenant,value="" key=TenantName,value=""
+      #- aws codepipeline tag-resource --resource-arn arn:aws:codepipeline:{{AWS_REGION}}:{{ACCOUNT_ID}}:eks-saas-pipeline --tags key=Tenant,value="" key=TenantName,value=""
       
       - ElbUrl=$(aws ssm get-parameter --name "/saas-boost/boost/LOADBALANCER" | jq -r '.Parameter.Value')
 
