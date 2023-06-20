@@ -12,8 +12,8 @@ spec:
       labels:
         app: order
     spec:
-      nodeSelector: #karpenters
-        saas-boost: eks-boost    
+#      nodeSelector: #karpenters
+#        saas-boost: eks-boost    
       containers:
         - name: order
           image: ORDER_SERVICE_ECR_REPO:latest

@@ -24,9 +24,9 @@ export class OrdersService {
     const path$ = idToken$.pipe(map((t) => t.payload['custom:path']));
     const plan$ = idToken$.pipe(map((t) => t.payload['custom:plan']));
     plan$.pipe(take(1)).subscribe(value => {
-      if (value === 'basic' || value === 'standard') {
+      if (value === 'Basic' ) {
         this.baseUrl = `${environment.apiUrl}/app/api/orders`;
-      } else if (value === 'premium' || value === 'Standard Tier' ) {
+      } else if (value === 'Premium' || value === 'Standard' ) {
         path$.pipe(take(1)).subscribe(pathValue => {
           this.baseUrl = `${environment.apiUrl}/` + pathValue + '/api/orders';
         });

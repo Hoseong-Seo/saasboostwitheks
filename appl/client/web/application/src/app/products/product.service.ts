@@ -26,9 +26,9 @@ export class ProductService {
     console.log("path:"+path$ +", plan:"+plan$);
     plan$.pipe(take(1)).subscribe(value => {
       console.log("plan:" +value);
-      if (value === 'Basic Tier' || value === 'Standard') {
+      if (value === 'Basic' ) {
         this.baseUrl = `${environment.apiUrl}/app/api/products`;
-      } else if (value === 'premium' || value === 'Standard Tier' ) {
+      } else if (value === 'Premium' || value === 'Standard' ) {
         path$.pipe(take(1)).subscribe(pathValue => {
           this.baseUrl = `${environment.apiUrl}/` + pathValue + '/api/products';
           console.log("baseUrl:" + this.baseUrl);

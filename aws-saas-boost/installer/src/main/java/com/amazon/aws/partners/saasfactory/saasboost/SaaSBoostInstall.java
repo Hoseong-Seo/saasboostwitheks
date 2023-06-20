@@ -644,6 +644,7 @@ public class SaaSBoostInstall {
             while (true) {
                 System.out.print("\n\nEnter the EKS Ingress Controller LoadBalancer DNS Name to Ingress traffic: ");
                 loadbalancerDNSName = Keyboard.readString();
+                
                 if (isNotBlank(loadbalancerDNSName)) {
                     if (validateLoadBalacerName(loadbalancerDNSName)) {
                         LOGGER.info("Setting LoadBalancer DNS Name = [{}]", loadbalancerDNSName);
@@ -654,6 +655,18 @@ public class SaaSBoostInstall {
                             .overwrite(true)
                             .build()
                         );
+                        
+                        String[] dnsName = loadbalancerDNSName.split("[-.]+");
+                        
+                        String nlbArnName = dnsName[0]+"/"+dnsName[1];
+                        ssm.putParameter(PutParameterRequest.builder()
+                            .name("/saas-boost/" + this.envName + "/LOADBALANCERARN")
+                            .type(ParameterType.STRING)
+                            .value(nlbArnName)
+                            .overwrite(true)
+                            .build()
+                        );
+                        
                         break;
                     } else {
                         outputMessage("Invalid LoadBalancer DNS name. Enter Ingress Controller LoadBalancer DNS name to use.");

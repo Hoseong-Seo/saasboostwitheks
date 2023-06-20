@@ -144,6 +144,15 @@ Parameters:
   SystemUserServiceDisable:
     Description: System User Service disable user Lambda ARN
     Type: String
+  NLBDnsName:
+    Description: VPC_LINK connection NLBDnsName 
+    Type: String
+    Default: ''
+  NLBArnName:
+    Description: VPC_LINK NlbInternal 
+    Type: String
+    Default: ''
+    
 Resources:
   AuthorizerExecRole:
     Type: AWS::IAM::Role
@@ -1953,6 +1962,271 @@ Resources:
             method.response.header.Access-Control-Allow-Origin: false
             method.response.header.Access-Control-Max-Age: false
             method.response.header.X-Requested-With: false
+  
+  
+  ApiGatewayVpcLink:
+    Type: AWS::ApiGateway::VpcLink
+    Properties: 
+      Name: boost
+      # NLBName: !Sub '{{resolve:ssm:/saas-boost/${Environment}/LOADBALANCER}}'
+      TargetArns: 
+        - !Sub arn:aws:elasticloadbalancing:${AWS::Region}:${AWS::AccountId}:loadbalancer/net/${NLBArnName}
+  
+  TenantServicePathResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref PublicApi
+      ParentId: !Ref RootResourceId
+      PathPart: '{tenant}'
+  TenantServiceApiResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref PublicApi
+      ParentId: !Ref TenantServicePathResource
+      PathPart: 'api'
+  TenantServiceOrdersResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref PublicApi
+      ParentId: !Ref TenantServiceApiResource
+      PathPart: 'orders'
+  TenantServiceOrdersMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref PublicApi
+      ResourceId: !Ref TenantServiceOrdersResource
+      HttpMethod: ANY
+      AuthorizationType: NONE
+      RequestParameters: {method.request.path.tenant: true}
+      # NLBDnsName: !Sub '{{resolve:ssm:/saas-boost/${Environment}/LOADBALANCER}}'
+      Integration:
+        ConnectionType: VPC_LINK
+        ConnectionId: !Ref ApiGatewayVpcLink
+        IntegrationHttpMethod: ANY
+        PassthroughBehavior: String
+        Type: HTTP_PROXY
+        
+        Uri: !Sub http://${NLBDnsName}/{tenant}/api/orders
+        PassthroughBehavior: WHEN_NO_MATCH
+        RequestParameters: {integration.request.path.tenant: 'method.request.path.tenant'}
+      MethodResponses:
+        - StatusCode: '200'
+          ResponseModels: {application/json: Empty}
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: false
+  TenantServiceOrdersResourceCORS:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref PublicApi
+      ResourceId: !Ref TenantServiceOrdersResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        PassthroughBehavior: WHEN_NO_MATCH
+        IntegrationResponses:
+          - StatusCode: '200'
+            ResponseTemplates: {application/json: ''}
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+              method.response.header.Access-Control-Max-Age: "'3600'"
+              method.response.header.X-Requested-With: "'*'"
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: '200'
+          ResponseModels: {application/json: Empty}
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: false
+            method.response.header.Access-Control-Allow-Methods: false
+            method.response.header.Access-Control-Allow-Origin: false
+            method.response.header.Access-Control-Max-Age: false
+            method.response.header.X-Requested-With: false
+  TenantServiceOrdersIdResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref PublicApi
+      ParentId: !Ref TenantServiceOrdersResource
+      PathPart: '{id}'     
+  TenantServiceOrdersIdMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref PublicApi
+      ResourceId: !Ref TenantServiceOrdersIdResource
+      HttpMethod: ANY
+      AuthorizationType: NONE
+      RequestParameters: {method.request.path.tenant: true}
+      Integration:
+        ConnectionType: VPC_LINK
+        ConnectionId: !Ref ApiGatewayVpcLink
+        IntegrationHttpMethod: ANY
+        PassthroughBehavior: String
+        Type: HTTP_PROXY
+        
+        Uri: !Sub http://${NLBDnsName}/{tenant}/api/orders/{id}
+        PassthroughBehavior: WHEN_NO_MATCH
+        RequestParameters: 
+          integration.request.path.tenant: 'method.request.path.tenant'
+          integration.request.path.id: 'method.request.path.id'
+      MethodResponses:
+        - StatusCode: '200'
+          ResponseModels: {application/json: Empty}
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: false
+  TenantServiceOrdersIdResourceCORS:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref PublicApi
+      ResourceId: !Ref TenantServiceOrdersIdResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        PassthroughBehavior: WHEN_NO_MATCH
+        IntegrationResponses:
+          - StatusCode: '200'
+            ResponseTemplates: {application/json: ''}
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+              method.response.header.Access-Control-Max-Age: "'3600'"
+              method.response.header.X-Requested-With: "'*'"
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: '200'
+          ResponseModels: {application/json: Empty}
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: false
+            method.response.header.Access-Control-Allow-Methods: false
+            method.response.header.Access-Control-Allow-Origin: false
+            method.response.header.Access-Control-Max-Age: false
+            method.response.header.X-Requested-With: false    
+      
+      
+  TenantServiceProductsResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref PublicApi
+      ParentId: !Ref TenantServiceApiResource
+      PathPart: 'products'    
+  TenantServiceProductsMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref PublicApi
+      ResourceId: !Ref TenantServiceProductsResource
+      HttpMethod: ANY
+      AuthorizationType: NONE
+      RequestParameters: {method.request.path.tenant: true}
+      Integration:
+        ConnectionType: VPC_LINK
+        ConnectionId: !Ref ApiGatewayVpcLink
+        IntegrationHttpMethod: ANY
+        PassthroughBehavior: String
+        Type: HTTP_PROXY
+        Uri: !Sub http://${NLBDnsName}/{tenant}/api/products
+        PassthroughBehavior: WHEN_NO_MATCH
+        RequestParameters: {integration.request.path.tenant: 'method.request.path.tenant'}
+      MethodResponses:
+        - StatusCode: '200'
+          ResponseModels: {application/json: Empty}
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: false
+  TenantServiceProductsResourceCORS:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref PublicApi
+      ResourceId: !Ref TenantServiceProductsResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        PassthroughBehavior: WHEN_NO_MATCH
+        IntegrationResponses:
+          - StatusCode: '200'
+            ResponseTemplates: {application/json: ''}
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+              method.response.header.Access-Control-Max-Age: "'3600'"
+              method.response.header.X-Requested-With: "'*'"
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: '200'
+          ResponseModels: {application/json: Empty}
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: false
+            method.response.header.Access-Control-Allow-Methods: false
+            method.response.header.Access-Control-Allow-Origin: false
+            method.response.header.Access-Control-Max-Age: false
+            method.response.header.X-Requested-With: false
+  TenantServiceProductsIdResource:
+    Type: AWS::ApiGateway::Resource
+    Properties:
+      RestApiId: !Ref PublicApi
+      ParentId: !Ref TenantServiceProductsResource
+      PathPart: '{id}'     
+  TenantServiceProductsIdMethod:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref PublicApi
+      ResourceId: !Ref TenantServiceProductsIdResource
+      HttpMethod: ANY
+      AuthorizationType: NONE
+      RequestParameters: {method.request.path.tenant: true}
+      Integration:
+        ConnectionType: VPC_LINK
+        ConnectionId: !Ref ApiGatewayVpcLink
+        IntegrationHttpMethod: ANY
+        PassthroughBehavior: String
+        Type: HTTP_PROXY
+        Uri: !Sub http://${NLBDnsName}/{tenant}/api/products/{id}
+        PassthroughBehavior: WHEN_NO_MATCH
+        RequestParameters: 
+          integration.request.path.tenant: 'method.request.path.tenant'
+          integration.request.path.id: 'method.request.path.id'
+      MethodResponses:
+        - StatusCode: '200'
+          ResponseModels: {application/json: Empty}
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Origin: false
+  TenantServiceProductsIdResourceCORS:
+    Type: AWS::ApiGateway::Method
+    Properties:
+      RestApiId: !Ref PublicApi
+      ResourceId: !Ref TenantServiceProductsIdResource
+      HttpMethod: OPTIONS
+      AuthorizationType: NONE
+      Integration:
+        Type: MOCK
+        PassthroughBehavior: WHEN_NO_MATCH
+        IntegrationResponses:
+          - StatusCode: '200'
+            ResponseTemplates: {application/json: ''}
+            ResponseParameters:
+              method.response.header.Access-Control-Allow-Headers: "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'"
+              method.response.header.Access-Control-Allow-Methods: "'GET,OPTIONS'"
+              method.response.header.Access-Control-Allow-Origin: "'*'"
+              method.response.header.Access-Control-Max-Age: "'3600'"
+              method.response.header.X-Requested-With: "'*'"
+        RequestTemplates:
+          application/json: '{"statusCode": 200}'
+      MethodResponses:
+        - StatusCode: '200'
+          ResponseModels: {application/json: Empty}
+          ResponseParameters:
+            method.response.header.Access-Control-Allow-Headers: false
+            method.response.header.Access-Control-Allow-Methods: false
+            method.response.header.Access-Control-Allow-Origin: false
+            method.response.header.Access-Control-Max-Age: false
+            method.response.header.X-Requested-With: false  
+
+  
             
   # To Do: Remove deployment from CloudFormation and deal with it either through
   # CodePipeline or a custom resource, or some other external deployment action.
@@ -2005,7 +2279,15 @@ Resources:
       - SystemUserServiceDisableMethod
       - SystemUserServiceDisableResourceCORS
       - OnboardingServiceQueryByTenantNameMethod
-      - OnboardingServiceApiQueryByTenantNameResourceCORS 
+      - OnboardingServiceApiQueryByTenantNameResourceCORS
+      - TenantServiceOrdersMethod
+      - TenantServiceOrdersResourceCORS
+      - TenantServiceOrdersIdMethod
+      - TenantServiceOrdersIdResourceCORS
+      - TenantServiceProductsMethod
+      - TenantServiceProductsResourceCORS
+      - TenantServiceProductsIdMethod
+      - TenantServiceProductsIdResourceCORS
     Properties:
       RestApiId: !Ref PublicApi
   ApiStage:

@@ -39,11 +39,45 @@ export default class ClusterConstruct extends Construct {
     // });
     
     const nginxIngressAddOn = new NginxIngressAddOn;  
-    const karpenterAddOn = new blueprints.KarpenterAddOn({
-        values: {
-          replicas: 1
-        }
-      });
+    
+    type operator = "In" | "NotIn";
+    type amiFamily = "AL2" | "Bottlerocket" | "Ubuntu" | undefined;
+    
+    const karpenterAddonProps = {
+      requirements: [
+          { key: "karpenter.k8s.aws/instance-category", op: "In" as operator, vals: ["c", "m", "r"] },
+          // { key: 'topology.kubernetes.io/zone', op: 'NotIn', vals: ['us-west-2c']},
+          { key: 'kubernetes.io/arch', op: 'In' as operator, vals: ['amd64']},
+          { key: 'karpenter.sh/capacity-type', op: 'In' as operator, vals: ['on-demand']},
+      ],
+      subnetTags: {
+        "Name": "cluster-stack/cluster-stack-vpc/PrivateSubnet*",
+      },
+      securityGroupTags: {
+        "kubernetes.io/cluster/cluster-stack": "owned",
+      },
+      tags: [
+        {key: "managed-by",value: "karpenter"},
+        {key: "intent",value: "apps"}
+      ],
+      labels: [
+        {key: "saas-boost",value: "eks-boost"}
+      ],
+      amiFamily: "AL2" as amiFamily,
+      ttlSecondsAfterEmpty: 30,
+      weight: 20,
+      interruptionHandling: true
+    }
+    
+    // const karpenterAddOn = new blueprints.KarpenterAddOn({
+    //     values: {
+    //       replicas: 1
+    //     }
+    //   });
+    
+    const karpenterAddOn = new blueprints.KarpenterAddOn(karpenterAddonProps);
+      
+      
     const metricsServerAddOn = new blueprints.MetricsServerAddOn({values: {
           name: "sb-metric"
         }});

@@ -12,8 +12,8 @@ spec:
       labels:
         app: product
     spec:
-      nodeSelector: #karpenters
-        saas-boost: eks-boost      
+#      nodeSelector: #karpenters
+#        saas-boost: eks-boost      
       containers:
         - name: product
           image: PRODUCT_SERVICE_ECR_REPO:latest
