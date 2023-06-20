@@ -67,7 +67,7 @@ Resources:
           EmailMessage: !Sub |
             <b>Welcome ${TenantName}!</b> <br>
             <br>
-            You can login to SaaS Service(E-Commerce) at <a rel="noopener noreferrer" href="${TenantUserPoolCallbackURLParameter}">${TenantUserPoolCallbackURLParameter}</a>.
+            You can login to SaaS Service(E-Commerce) at <a rel="noopener noreferrer" href="https://${TenantUserPoolCallbackURLParameter}/index.html">https://${TenantUserPoolCallbackURLParameter}/index.html</a>
             <br>
             Your username is:  <b>{username}</b>
             <br>
