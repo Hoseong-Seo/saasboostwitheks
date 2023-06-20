@@ -2057,7 +2057,9 @@ Resources:
       ResourceId: !Ref TenantServiceOrdersIdResource
       HttpMethod: ANY
       AuthorizationType: NONE
-      RequestParameters: {method.request.path.tenant: true}
+      RequestParameters: 
+        method.request.path.tenant: true
+        method.request.path.id: true
       Integration:
         ConnectionType: VPC_LINK
         ConnectionId: !Ref ApiGatewayVpcLink
@@ -2178,7 +2180,9 @@ Resources:
       ResourceId: !Ref TenantServiceProductsIdResource
       HttpMethod: ANY
       AuthorizationType: NONE
-      RequestParameters: {method.request.path.tenant: true}
+      RequestParameters: 
+        method.request.path.tenant: true
+        method.request.path.id: true
       Integration:
         ConnectionType: VPC_LINK
         ConnectionId: !Ref ApiGatewayVpcLink

@@ -53,31 +53,46 @@ Parameters:
     Description: "Enter Tenant userpool Name"  
 Resources:
   CognitoUsersUserPool:
-    Type: "AWS::Cognito::UserPool"
+    Type: AWS::Cognito::UserPool
     Properties:
       UserPoolName: !Ref UserPoolName
-      AutoVerifiedAttributes:
-        - "email"
-      AccountRecoverySetting:
-        RecoveryMechanisms:
-          - Name: verified_email
-            Priority: 1
+      # AutoVerifiedAttributes:
+      #   - "email"
+      # AccountRecoverySetting:
+      #   RecoveryMechanisms:
+      #     - Name: verified_email
+      #       Priority: 1
       AdminCreateUserConfig:      
         InviteMessageTemplate:
-          EmailMessage: !Join 
-            - "" 
-            - - "Login into Tenant: " 
-              - !Ref TenantName 
-              - " Admin UI Application at " 
-              - "https://"
-              - !Ref TenantUserPoolCallbackURLParameter 
-              - "/index.html" 
-              - " with username {username} and temporary password {####} "
-              - "            Please note that it may take a few minutes to provision your tenant."
-              - " If you get a 404 when hitting the link above please try again in a few minutes."
-          EmailSubject: !Join 
-            - ""
-            - - "Your Temporary Password for Admin UI application"  
+          EmailMessage: !Sub |
+            <b>Welcome ${TenantName}!</b> <br>
+            <br>
+            You can login to SaaS Service(E-Commerce) at <a rel="noopener noreferrer" href="${TenantUserPoolCallbackURLParameter}">${TenantUserPoolCallbackURLParameter}</a>.
+            <br>
+            Your username is:  <b>{username}</b>
+            <br>
+            Your temporary password is:  <b>{####}</b>
+            <br>
+            Please note that it may take a few minutes to provision your tenant. 
+            <br>
+            If you get a 404 when hitting the link above please try again in a few minutes.
+            <br>
+          EmailSubject: !Sub AWS SaaS Boost temporary password for environment ${Environment}
+          
+          # EmailMessage: !Join 
+          #   - "" 
+          #   - - "Login into Tenant: " 
+          #     - !Ref TenantName 
+          #     - " Admin UI Application at " 
+          #     - "https://"
+          #     - !Ref TenantUserPoolCallbackURLParameter 
+          #     - "/index.html" 
+          #     - " with username {username} and temporary password {####} "
+          #     - "            Please note that it may take a few minutes to provision your tenant."
+          #     - " If you get a 404 when hitting the link above please try again in a few minutes."
+          # EmailSubject: !Join 
+          #   - ""
+          #   - - "Your Temporary Password for Admin UI application"  
       Schema:
         - AttributeDataType: "String"
           Name: email
