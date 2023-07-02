@@ -1133,7 +1133,7 @@ Resources:
           ONBOARDING_VALIDATION_DLQ: !Ref OnboardingValidationDLQ
           RESOURCES_BUCKET: !Ref ResourcesBucket
           TENANT_CONFIG_DLQ: !Ref OnboardingTenantConfigDLQ
-          LOADBALANCER_DNS_NAME: !Sub '{{resolve:ssm:/saas-boost/${Environment}/LOADBALANCER}}'          
+          TENANT_URL: !Sub '{{resolve:ssm:/saas-boost/${Environment}/LOADBALANCER}}'          
       Tags:
         - Key: Application
           Value: SaaSBoost

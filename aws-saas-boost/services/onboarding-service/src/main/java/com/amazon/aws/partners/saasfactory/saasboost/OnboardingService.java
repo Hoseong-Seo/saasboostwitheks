@@ -85,7 +85,7 @@ public class OnboardingService {
     private static final String ONBOARDING_VALIDATION_DLQ = System.getenv("ONBOARDING_VALIDATION_DLQ");
     private static final String RESOURCES_BUCKET = System.getenv("RESOURCES_BUCKET");
     private static final String TENANT_CONFIG_DLQ = System.getenv("TENANT_CONFIG_DLQ");
-    private static final String LOADBALANCER_DNS_NAME = System.getenv("LOADBALANCER_DNS_NAME");
+    private static final String TENANT_URL = System.getenv("TENANT_URL");
     
     private static final String RESOURCES_BUCKET_TEMP_FOLDER = "00temp/";
     private final OnboardingServiceDAL dal;
@@ -645,7 +645,7 @@ public class OnboardingService {
                 
                 String adminEmailParameter = Objects.toString(email, "");
                 String tenantAdminRoleNameParameter = "";
-                String tenantUserPoolCallbackURLParameter = LOADBALANCER_DNS_NAME +"/"+tenantName;  //DNSCHECK
+                String tenantUserPoolCallbackURLParameter = TENANT_URL +"/"+tenantName;  //DNSCHECK
                 String userPoolName = Objects.toString(stackName+"-userpool", "");
                
                 
@@ -673,7 +673,7 @@ public class OnboardingService {
                 templateParameters.add(Parameter.builder().parameterKey("TenantAdminRoleNameParameter").parameterValue(tenantAdminRoleNameParameter).build());
                 templateParameters.add(Parameter.builder().parameterKey("TenantUserPoolCallbackURLParameter").parameterValue(tenantUserPoolCallbackURLParameter).build());
                 templateParameters.add(Parameter.builder().parameterKey("UserPoolName").parameterValue(userPoolName).build());
-                templateParameters.add(Parameter.builder().parameterKey("LoadbalancerDNSName").parameterValue(LOADBALANCER_DNS_NAME).build());
+                templateParameters.add(Parameter.builder().parameterKey("LoadbalancerDNSName").parameterValue(TENANT_URL).build());
 
 
                 for (Parameter p : templateParameters) {
