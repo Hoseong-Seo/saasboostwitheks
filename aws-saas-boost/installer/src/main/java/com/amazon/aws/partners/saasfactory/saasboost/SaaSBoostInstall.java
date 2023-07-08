@@ -120,7 +120,7 @@ public class SaaSBoostInstall {
         UPDATE(4, "Update existing AWS SaaS Boost deployment.", true),
         DELETE(5, "Delete existing AWS SaaS Boost deployment.", true),
         CANCEL(6, "Exit installer.", false),
-        SAAS_BOOST_ON_EKS(7, "New AWS SaaS Boost install on EKS", false);
+        SAAS_BOOST_ON_EKS(7, "New AWS SaaS Boost install with EKS", false);
         //DEBUG(7, "Debug", false);
 
         private final int choice;
