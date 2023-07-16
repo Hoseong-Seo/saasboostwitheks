@@ -2,9 +2,9 @@ FROM public.ecr.aws/bitnami/node:16.13.1 AS build
 WORKDIR /app
 COPY package.json ./
 COPY yarn.lock ./
-RUN yarn
+RUN yarn 2>/dev/null
 COPY . .
-RUN yarn build
+RUN yarn build 2>/dev/null
 
 FROM public.ecr.aws/bitnami/node:16.13.1
 WORKDIR /app
