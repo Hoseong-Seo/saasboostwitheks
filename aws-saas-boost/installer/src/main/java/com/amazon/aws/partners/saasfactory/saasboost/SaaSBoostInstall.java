@@ -745,20 +745,22 @@ public class SaaSBoostInstall {
         
             BufferedReader reader = new BufferedReader(new InputStreamReader(p.getInputStream()));
             BufferedReader errorReader = new BufferedReader(new InputStreamReader(p.getErrorStream()));
-        
             
-            // ArrayList<String> goodLines = new ArrayList<String>();
-            // String line = null;
-            // while ((line = reader.readLine()) != null) {
-            //   if ((reader.getLineNumber()+1) % 10 == 0) {
-            //       goodLines.add(line);
-            //   }
-            //   else
-            //         System.out.println(goodLines);
-            // }
             String line = "";
-            while ((line = reader.readLine()) != null) {
+            int lineCnt = 0;
+            while ((line = reader.readLine()) != null){
+                // System.out.print("\r                \r");
+                // System.out.print(String.format("\033[2J
+                lineCnt++;
                 System.out.println(line);
+                if(5 == lineCnt) {
+                    for(int i=0; i<lineCnt; i++) {
+                        int count = 1; 
+                        System.out.print(String.format("\033[%dA",count)); // Move up
+                        System.out.print("\033[2K"); // Erase line content
+                    }
+                    lineCnt = 0;
+                }
             }
         
             line = "";
