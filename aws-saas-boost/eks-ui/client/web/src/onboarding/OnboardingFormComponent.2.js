@@ -203,6 +203,12 @@ export default function OnboardingFormComponent(props) {
                       type="text"
                       maxLength={100}
                     />
+                    <SaasBoostInput
+                      name="email"
+                      label="EMail"
+                      type="text"
+                      maxLength={100}
+                    />
                     {getTiers(tiers, formik.values.tier)}
                     {getDomainUi(domainName, hasDomain)}
                     {getBillingUi(billingPlans, hasBilling)}

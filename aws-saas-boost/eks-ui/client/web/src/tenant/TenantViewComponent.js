@@ -226,10 +226,10 @@ function TenantViewComponent(props) {
                             style={{ paddingTop: 0 }}
                             active={true}
                             target="_blank"
-                            href={`http://${tenant.hostname}`}
+                            href={`http://${tenant.hostname}/${tenant.name}/index.html`}
                             className="pl-0"
                           >
-                            {`http://${tenant.hostname}`}
+                            {`http://${tenant.hostname}/${tenant.name}/index.html`}
                             <CIcon
                               icon={cilExternalLink}
                               customClassName="ml-2 icon"
@@ -306,7 +306,7 @@ function TenantViewComponent(props) {
               </Card.Header>
               <Card.Body>
                 <Row className="pt-3">
-                  <Col
+                {/*  <Col
                     sm={4}
                     className="border border border-top-0 border-bottom-0 border-left-0"
                   >
@@ -346,9 +346,9 @@ function TenantViewComponent(props) {
                         )}
                       </Display>
                     </dd>
-                  </Col>
+                  </Col>*/}
                   <Col
-                    sm={4}
+                    sm={15}
                     className="border border border-top-0 border-bottom-0 border-left-0"
                   >
                     <dd>
@@ -394,7 +394,7 @@ function TenantViewComponent(props) {
                           <NavLink
                             active={true}
                             target="_blank"
-                            href={tenant.resources.CLOUDFORMATION.consoleUrl}
+                            href={tenant.resources.CLOUDFORMATION === undefined ? "":tenant.resources.CLOUDFORMATION.consoleUrl}
                             className="pl-0"
                           >
                             CloudFormation Details
@@ -407,7 +407,7 @@ function TenantViewComponent(props) {
                       </Display>
                     </dd>
                   </Col>
-                  <Col sm={4}>
+                  {/*<Col sm={4}>
                     <dd>
                       <Display>
                         {!!tenant && !!tenant.resources && (
@@ -426,7 +426,7 @@ function TenantViewComponent(props) {
                         )}
                       </Display>
                     </dd>
-                  </Col>
+                  </Col>*/}
                 </Row>
               </Card.Body>
             </Card>
