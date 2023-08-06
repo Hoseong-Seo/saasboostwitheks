@@ -1,0 +1,205 @@
+# Copyright Amazon.com, Inc. or its affiliates. All Rights Reserved.
+# SPDX-License-Identifier: MIT-0
+
+AWSTemplateFormatVersion: "2010-09-09"
+Description: 'Template to setup cognito as tenant onboarding'
+Parameters:
+  Environment:
+    Description: Environment (test, uat, prod, etc.)
+    Type: String
+  Tier:
+    Description: The tier this tenant is onboading into
+    Type: String
+    Default: ''
+  TenantId:
+    Description: The tenant Id
+    Type: String    
+  TenantName:
+    Description: The tenant Name
+    Type: String      
+  DomainName:
+    Description: The DomainName name
+    Type: String  
+  HostedZoneId:  
+    Description: The HostedZoneId Id
+    Type: String
+  TenantSubDomain:  
+    Description: The TenantSubDomain
+    Type: String
+  HostedZoneId:  
+    Description: The HostedZoneId
+    Type: String
+  LoadbalancerDNSName:
+    Description: DNSName for this tenant's application load balancer
+    Type: String
+  SSLCertificateArn:
+    Description: The ACM ARN of the SSL certificate for the application's domain
+    Type: String
+    Default: ''  
+  AdminEmailParameter:
+    Type: String
+    Description: "Enter tenant admin email address"
+  TenantAdminRoleNameParameter:
+    Type: String
+    Description: "Enter the role name for tenant admin"
+  # UserPoolCallbackURLParameter: 
+  #   Type: String
+  #   Description: "Enter Admin Management userpool call back url"
+  TenantUserPoolCallbackURLParameter:
+    Type: String
+    Description: "Enter Tenant Management userpool call back url"
+  UserPoolName:
+    Type: String
+    Description: "Enter Tenant userpool Name"  
+Resources:
+  CognitoUsersUserPool:
+    Type: AWS::Cognito::UserPool
+    Properties:
+      UserPoolName: !Ref UserPoolName
+      # AutoVerifiedAttributes:
+      #   - "email"
+      # AccountRecoverySetting:
+      #   RecoveryMechanisms:
+      #     - Name: verified_email
+      #       Priority: 1
+      AdminCreateUserConfig:      
+        InviteMessageTemplate:
+          EmailMessage: !Sub |
+            <b>Welcome ${TenantName}!</b> <br>
+            <br>
+            You can login to SaaS Service(E-Commerce) at <a rel="noopener noreferrer" href="https://${TenantUserPoolCallbackURLParameter}/index.html">https://${TenantUserPoolCallbackURLParameter}/index.html</a>
+            <br>
+            Your username is:  <b>{username}</b>
+            <br>
+            Your temporary password is:  <b>{####}</b>
+            <br>
+            Please note that it may take a few minutes to provision your tenant. 
+            <br>
+            If you get a 404 when hitting the link above please try again in a few minutes.
+            <br>
+          EmailSubject: !Sub AWS SaaS Boost temporary password for environment ${Environment}
+          
+          # EmailMessage: !Join 
+          #   - "" 
+          #   - - "Login into Tenant: " 
+          #     - !Ref TenantName 
+          #     - " Admin UI Application at " 
+          #     - "https://"
+          #     - !Ref TenantUserPoolCallbackURLParameter 
+          #     - "/index.html" 
+          #     - " with username {username} and temporary password {####} "
+          #     - "            Please note that it may take a few minutes to provision your tenant."
+          #     - " If you get a 404 when hitting the link above please try again in a few minutes."
+          # EmailSubject: !Join 
+          #   - ""
+          #   - - "Your Temporary Password for Admin UI application"  
+      Schema:
+        - AttributeDataType: "String"
+          Name: email
+          Required: True
+          Mutable: True
+        - AttributeDataType: "String"
+          Name: tenant-id
+        - AttributeDataType: "String"
+          Name: company-name  
+        - AttributeDataType: "String"
+          Name: userRole
+          Required: False
+          Mutable: True
+        - AttributeDataType: "String"
+          Name: path
+        - AttributeDataType: "String"
+          Name: plan
+
+  CognitoUsersUserPoolClient:
+    Type: "AWS::Cognito::UserPoolClient"
+    Properties:
+      ClientName: SaaSBoostUsersPoolClient
+      GenerateSecret: false
+      UserPoolId: !Ref CognitoUsersUserPool
+      AllowedOAuthFlowsUserPoolClient: True
+      AllowedOAuthFlows:
+        - code
+        - implicit
+      SupportedIdentityProviders:
+        - COGNITO
+      CallbackURLs:
+        - !Join ["",["https://", !Ref TenantUserPoolCallbackURLParameter, "/"]]
+      LogoutURLs:  
+        - !Join ["",["https://", !Ref TenantUserPoolCallbackURLParameter, "/"]]
+      AllowedOAuthScopes:
+        - email
+        - openid
+        - profile
+      WriteAttributes:
+        - "email"
+        - "custom:tenant-id"
+        - "custom:company-name"
+        - "custom:userRole"
+        - "custom:path"
+        - "custom:plan"
+  CognitoUsersUserPoolDomain:
+    Type: AWS::Cognito::UserPoolDomain
+    Properties:
+      Domain: !Join ["-", [!Ref TenantName,!Ref "AWS::AccountId"]]
+      UserPoolId: !Ref CognitoUsersUserPool
+  CognitoAdminUserGroup:
+    Type: AWS::Cognito::UserPoolGroup
+    Properties:
+      GroupName: TenantAdmins
+      Description: Admin user group
+      Precedence: 0
+      UserPoolId: !Ref CognitoUsersUserPool
+  CognitoAdminUser:
+    Type: AWS::Cognito::UserPoolUser
+    Properties:
+      Username: admin
+      DesiredDeliveryMediums:
+        - EMAIL
+      ForceAliasCreation: true
+      UserAttributes:
+        - Name: email
+          Value: !Ref AdminEmailParameter
+        - Name: custom:tenant-id
+          Value: !Ref TenantId
+        - Name: custom:company-name
+          Value: !Ref TenantName  
+        - Name: custom:userRole
+          Value: !Ref TenantAdminRoleNameParameter
+        - Name: custom:path
+          Value: !Ref TenantName  
+        - Name: custom:plan
+          Value: !Ref Tier    
+      UserPoolId: !Ref CognitoUsersUserPool
+  CognitoAddUserToGroup:
+      Type: AWS::Cognito::UserPoolUserToGroupAttachment
+      Properties:
+        GroupName: !Ref CognitoAdminUserGroup
+        Username: !Ref CognitoAdminUser
+        UserPoolId: !Ref CognitoUsersUserPool
+        
+      
+        
+Outputs:
+  CognitoUsersUserPoolId:
+    Value: !Ref CognitoUsersUserPool
+  CognitoUsersUserPoolClientId:
+    Value: !Ref CognitoUsersUserPoolClient
+  CognitoUsersUserPoolProviderURL:
+    Value: !GetAtt CognitoUsersUserPool.ProviderURL
+  
+  TenantId:
+    Description: The TenantId
+    Value: !Ref TenantId    
+  TenantName:
+    Description: The tenantName
+    Value: !Ref TenantName
+  Tier:
+    Description: The Tier
+    Value: !Ref Tier  
+  LoadbalancerDNSName:
+    Description: DNSName for this tenant's application load balancer
+    Value: !Ref LoadbalancerDNSName
+  DNSName:
+    Description: DNSName for this tenant's application load balancer
+    Value: !Ref LoadbalancerDNSName  

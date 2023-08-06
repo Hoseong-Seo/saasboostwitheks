@@ -20,7 +20,7 @@ CWD=$(pwd)
 #cd ~/environment/aws-saas-boost/
 
 
-cp -r eks-ui/client/web client/
+cp -r eks-file/client/web client/
 
 #cdk init app --language typescript  > /dev/null 2>&1
 #npm i @aws-quickstart/eks-blueprints@1.7.0

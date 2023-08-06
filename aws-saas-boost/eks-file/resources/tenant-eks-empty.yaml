@@ -1,0 +1,58 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Description: 'CloudFormation exports'
+Parameters:
+  Environment:
+    Description: Environment (test, uat, prod, etc.)
+    Type: String
+  DomainName:
+    Description: The hosted zone domain name
+    Type: String
+  HostedZoneId:
+    Description: The hosted zone for this domain name
+    Type: String
+  TenantId:
+    Description: The GUID for the tenant
+    Type: String
+  TenantName:
+    Description: The tenant name
+    Type: String  
+  TenantSubDomain:
+    Description: The subdomain for this tenant
+    Type: String
+  Tier:
+    Description: The tier this tenant is onboading into
+    Type: String
+    Default: ''
+  PrivateServices:
+    Description: True if the appConfig for this tenant contains private services
+    Type: String
+    Default: 'false'
+    AllowedValues: ['true', 'false']
+ 
+Conditions:
+  HasNot: !Equals [ 'true', 'false' ]
+ 
+# dummy (null) resource, never created
+Resources:
+  NullResource:
+    Type: 'Custom::NullResource'
+    Condition: HasNot
+ 
+
+Outputs:
+  LoadBalancer:
+    Description: Full name for this tenant's application load balancer
+    Value: 'sb-dev-tenant-e6140c6e-1194163301.ap-northeast-2.elb.amazonaws.com'
+  DNSName:
+    Description: DNSName for this tenant's application load balancer
+    Value: 'sb-dev-tenant-e6140c6e-1194163301.ap-northeast-2.elb.amazonaws.com'
+  ExportsStackName:
+    Value: !Ref 'AWS::StackName'
+    Export:
+      Name: !Sub 'ExportsStackName-${AWS::StackName}'
+  TenantId:
+    Description: The TenantId
+    Value: !Ref TenantId    
+  TenantName:
+    Description: The tenantName
+    Value: !Ref TenantName    
